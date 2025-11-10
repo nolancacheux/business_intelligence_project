@@ -1,0 +1,16 @@
+# Dépendances Python pour le POC Crésus
+# Installation : pip install -r requirements.txt
+
+# Base de données
+psycopg2-binary==2.9.9
+
+# Manipulation de données
+pandas==2.1.3
+numpy==1.26.2
+
+# Modélisation prédictive
+scikit-learn==1.3.2
+
+# Utilitaires
+python-dateutil==2.8.2
+

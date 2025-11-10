@@ -1,0 +1,3 @@
+# Ce fichier permet de garder le dossier sources dans Git
+# Les fichiers CSV générés seront ignorés par .gitignore
+

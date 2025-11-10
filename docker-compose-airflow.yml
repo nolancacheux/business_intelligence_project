@@ -1,0 +1,178 @@
+version: '3.8'
+
+services:
+  postgres-airflow:
+    image: postgres:15-alpine
+    container_name: cresus_airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_airflow_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+    restart: always
+    networks:
+      - airflow-network
+
+  redis:
+    image: redis:latest
+    container_name: cresus_airflow_redis
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+    restart: always
+    networks:
+      - airflow-network
+
+  airflow-webserver:
+    image: apache/airflow:2.7.0
+    container_name: cresus_airflow_webserver
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env-airflow
+    environment:
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: 'psycopg2-binary pandas scikit-learn'
+      AIRFLOW__CORE__EXECUTOR: 'CeleryExecutor'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow'
+      AIRFLOW__CELERY__BROKER_URL: 'redis://redis:6379/0'
+      AIRFLOW__CELERY__RESULT_BACKEND: 'db+postgresql://airflow:airflow@postgres-airflow:5432/airflow'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data:/opt/airflow/data
+      - airflow-logs:/opt/airflow/logs
+      - airflow-config:/opt/airflow/config
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - airflow-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    container_name: cresus_airflow_scheduler
+    depends_on:
+      airflow-webserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env-airflow
+    environment:
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: 'psycopg2-binary pandas scikit-learn'
+      AIRFLOW__CORE__EXECUTOR: 'CeleryExecutor'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow'
+      AIRFLOW__CELERY__BROKER_URL: 'redis://redis:6379/0'
+      AIRFLOW__CELERY__RESULT_BACKEND: 'db+postgresql://airflow:airflow@postgres-airflow:5432/airflow'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data:/opt/airflow/data
+      - airflow-logs:/opt/airflow/logs
+      - airflow-config:/opt/airflow/config
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - airflow-network
+
+  airflow-worker:
+    image: apache/airflow:2.7.0
+    container_name: cresus_airflow_worker
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres-airflow:
+        condition: service_healthy
+    env_file:
+      - .env-airflow
+    environment:
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: 'psycopg2-binary pandas scikit-learn'
+      AIRFLOW__CORE__EXECUTOR: 'CeleryExecutor'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow'
+      AIRFLOW__CELERY__BROKER_URL: 'redis://redis:6379/0'
+      AIRFLOW__CELERY__RESULT_BACKEND: 'db+postgresql://airflow:airflow@postgres-airflow:5432/airflow'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data:/opt/airflow/data
+      - airflow-logs:/opt/airflow/logs
+      - airflow-config:/opt/airflow/config
+    command: celery worker
+    healthcheck:
+      test: ["CMD-SHELL", "celery --app airflow.executors.celery_executor.app inspect ping -d celery@$${HOSTNAME} || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - airflow-network
+
+  airflow-init:
+    image: apache/airflow:2.7.0
+    container_name: cresus_airflow_init
+    env_file:
+      - .env-airflow
+    environment:
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - airflow-logs:/opt/airflow/logs
+      - airflow-config:/opt/airflow/config
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "$${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow version
+    user: "0:0"
+    networks:
+      - airflow-network
+
+volumes:
+  postgres_airflow_data:
+  airflow-logs:
+  airflow-config:
+
+networks:
+  airflow-network:
+    driver: bridge
+

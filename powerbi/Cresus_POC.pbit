@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "name": "Cresus_POC",
+  "description": "Template Power BI pour le POC Crésus - BI Prédictive Trésorerie",
+  "connectionDetails": {
+    "server": "localhost",
+    "database": "cresus_db",
+    "provider": "PostgreSQL"
+  },
+  "tables": [
+    {
+      "name": "FACT_FLUX_TRESORERIE",
+      "description": "Table de faits contenant les flux de trésorerie"
+    },
+    {
+      "name": "DIM_TEMPS",
+      "description": "Dimension temporelle"
+    },
+    {
+      "name": "DIM_SCENARIO",
+      "description": "Dimension des scénarios"
+    },
+    {
+      "name": "DIM_DEVISE",
+      "description": "Dimension des devises"
+    },
+    {
+      "name": "DIM_FILIALE",
+      "description": "Dimension des filiales"
+    },
+    {
+      "name": "DIM_COMPTE",
+      "description": "Dimension des comptes"
+    },
+    {
+      "name": "DIM_CONTREPARTIE",
+      "description": "Dimension des contreparties"
+    }
+  ],
+  "relationships": [
+    {
+      "fromTable": "FACT_FLUX_TRESORERIE",
+      "fromColumn": "id_compte",
+      "toTable": "DIM_COMPTE",
+      "toColumn": "id_compte",
+      "cardinality": "ManyToOne"
+    },
+    {
+      "fromTable": "FACT_FLUX_TRESORERIE",
+      "fromColumn": "id_devise",
+      "toTable": "DIM_DEVISE",
+      "toColumn": "id_devise",
+      "cardinality": "ManyToOne"
+    },
+    {
+      "fromTable": "FACT_FLUX_TRESORERIE",
+      "fromColumn": "id_scenario",
+      "toTable": "DIM_SCENARIO",
+      "toColumn": "id_scenario",
+      "cardinality": "ManyToOne"
+    },
+    {
+      "fromTable": "FACT_FLUX_TRESORERIE",
+      "fromColumn": "id_temps",
+      "toTable": "DIM_TEMPS",
+      "toColumn": "id_temps",
+      "cardinality": "ManyToOne"
+    },
+    {
+      "fromTable": "FACT_FLUX_TRESORERIE",
+      "fromColumn": "id_contrepartie",
+      "toTable": "DIM_CONTREPARTIE",
+      "toColumn": "id_contrepartie",
+      "cardinality": "ManyToOne"
+    },
+    {
+      "fromTable": "DIM_COMPTE",
+      "fromColumn": "id_devise",
+      "toTable": "DIM_DEVISE",
+      "toColumn": "id_devise",
+      "cardinality": "ManyToOne"
+    },
+    {
+      "fromTable": "DIM_COMPTE",
+      "fromColumn": "id_filiale",
+      "toTable": "DIM_FILIALE",
+      "toColumn": "id_filiale",
+      "cardinality": "ManyToOne"
+    }
+  ],
+  "measures": [
+    {
+      "name": "Trésorerie Totale",
+      "expression": "SUM(FACT_FLUX_TRESORERIE[montant_consolide_eur])",
+      "table": "FACT_FLUX_TRESORERIE"
+    },
+    {
+      "name": "Trésorerie Réalisée",
+      "expression": "CALCULATE([Trésorerie Totale], FACT_FLUX_TRESORERIE[statut] = \"Réalisé\")",
+      "table": "FACT_FLUX_TRESORERIE"
+    },
+    {
+      "name": "Trésorerie Prévisionnelle",
+      "expression": "CALCULATE([Trésorerie Totale], FACT_FLUX_TRESORERIE[statut] = \"Prévisionnel\")",
+      "table": "FACT_FLUX_TRESORERIE"
+    }
+  ],
+  "note": "Ce fichier .pbit est un template JSON. Power BI Desktop utilise un format binaire (.pbix) qui ne peut pas être généré directement. Utilisez les instructions dans POWER_BI_INSTRUCTIONS.md pour créer le rapport dans Power BI Desktop."
+}
+
