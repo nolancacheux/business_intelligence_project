@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gaia
-class: lead
+# class: lead
 paginate: true
 backgroundColor: #fff
 backgroundImage: url('https://marp.app/assets/hero-background.jpg')
