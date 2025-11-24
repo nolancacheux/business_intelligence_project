@@ -42,7 +42,7 @@ def generate_dim_filiale():
                 "pays": filiale["pays"],
                 "region": filiale["region"]
             })
-    print(f"✓ Généré dim_filiale.csv ({len(filiales)} lignes)")
+    print(f"[OK] Généré dim_filiale.csv ({len(filiales)} lignes)")
 
 
 def generate_dim_devise():
@@ -63,7 +63,7 @@ def generate_dim_devise():
                 "code_iso": devise["code_iso"],
                 "libelle_devise": devise["libelle_devise"]
             })
-    print(f"✓ Généré dim_devise.csv ({len(devises)} lignes)")
+    print(f"[OK] Généré dim_devise.csv ({len(devises)} lignes)")
     return devises
 
 
@@ -84,7 +84,7 @@ def generate_dim_scenario():
                 "nom_scenario": scenario["nom_scenario"],
                 "description": scenario["description"]
             })
-    print(f"✓ Généré dim_scenario.csv ({len(scenarios)} lignes)")
+    print(f"[OK] Généré dim_scenario.csv ({len(scenarios)} lignes)")
     return scenarios
 
 
@@ -132,7 +132,7 @@ def generate_dim_contrepartie():
                 "nom_contrepartie": contrepartie["nom_contrepartie"],
                 "type_contrepartie": contrepartie["type_contrepartie"]
             })
-    print(f"✓ Généré dim_contrepartie.csv ({len(contreparties)} lignes)")
+    print(f"[OK] Généré dim_contrepartie.csv ({len(contreparties)} lignes)")
     return contreparties
 
 
@@ -165,7 +165,7 @@ def generate_dim_compte(num_filiales, num_devises):
         writer.writeheader()
         for compte in comptes:
             writer.writerow(compte)
-    print(f"✓ Généré dim_compte.csv ({len(comptes)} lignes)")
+    print(f"[OK] Généré dim_compte.csv ({len(comptes)} lignes)")
     return comptes
 
 
@@ -190,7 +190,7 @@ def generate_dim_temps():
         writer.writeheader()
         for record in temps_records:
             writer.writerow(record)
-    print(f"✓ Généré dim_temps.csv ({len(temps_records)} lignes)")
+    print(f"[OK] Généré dim_temps.csv ({len(temps_records)} lignes)")
     return temps_records
 
 
@@ -244,26 +244,39 @@ def generate_taux_de_change():
         writer.writeheader()
         for record in taux_records:
             writer.writerow(record)
-    print(f"✓ Généré taux_de_change.csv ({len(taux_records)} lignes)")
+    print(f"[OK] Généré taux_de_change.csv ({len(taux_records)} lignes)")
     return taux_records
 
 
 def generate_fact_flux_tresorerie(comptes, temps_records, num_contreparties):
-    """Génère la table de faits FACT_FLUX_TRESORERIE"""
+    """Génère la table de faits FACT_FLUX_TRESORERIE avec des données réalistes"""
     flux_records = []
     
-    types_operation = [
-        "Virement émis",
-        "Virement reçu",
-        "Prêt",
-        "Remboursement prêt",
-        "Dépôt",
-        "Retrait",
-        "Frais bancaires",
-        "Intérêts créditeurs",
-        "Intérêts débiteurs"
+    # Configuration des opérations : Poids, Signe (+/-), Plages de montants, Mode (pour distribution triangulaire)
+    ops_config = [
+        # Opérations courantes (flux réguliers)
+        {"type": "Virement émis",        "sign": -1, "weight": 30, "min": 100,    "max": 150000,  "mode": 2500},   # Paiements fournisseurs, charges...
+        {"type": "Virement reçu",        "sign": 1,  "weight": 30, "min": 100,    "max": 200000,  "mode": 5000},   # Paiements clients
+        
+        # Opérations de guichet
+        {"type": "Dépôt",                "sign": 1,  "weight": 10, "min": 500,    "max": 50000,   "mode": 2000},
+        {"type": "Retrait",              "sign": -1, "weight": 5,  "min": 50,     "max": 3000,    "mode": 200},
+        
+        # Opérations de financement (Montants importants, plus rares)
+        {"type": "Prêt",                 "sign": 1,  "weight": 1,  "min": 100000, "max": 5000000, "mode": 500000}, # Déblocage de fonds
+        {"type": "Remboursement prêt",   "sign": -1, "weight": 5,  "min": 1000,   "max": 50000,   "mode": 5000},   # Échéances
+        
+        # Frais et intérêts (Petits montants, fréquents ou périodiques)
+        {"type": "Frais bancaires",      "sign": -1, "weight": 15, "min": 10,     "max": 500,     "mode": 30},
+        {"type": "Intérêts créditeurs",  "sign": 1,  "weight": 2,  "min": 50,     "max": 5000,    "mode": 200},    # Placements
+        {"type": "Intérêts débiteurs",   "sign": -1, "weight": 2,  "min": 50,     "max": 10000,   "mode": 500},    # Agios, découverts
     ]
     
+    # Préparation des poids et types pour random.choices
+    types_list = [op["type"] for op in ops_config]
+    weights_list = [op["weight"] for op in ops_config]
+    config_map = {op["type"]: op for op in ops_config}
+
     statuts = ["Réalisé", "Prévisionnel"]
     
     # Générer environ 5000 transactions sur la période
@@ -291,14 +304,18 @@ def generate_fact_flux_tresorerie(comptes, temps_records, num_contreparties):
         id_compte = compte['id_compte']
         id_devise = compte['id_devise']
         
-        # Montant transaction (entre -1M et +1M)
-        montant_transaction = round(random.uniform(-1000000, 1000000), 2)
+        # Sélectionner un type d'opération pondéré
+        type_operation = random.choices(types_list, weights=weights_list, k=1)[0]
+        op_cfg = config_map[type_operation]
         
-        # Type d'opération
-        type_operation = random.choice(types_operation)
+        # Générer un montant réaliste (distribution triangulaire)
+        base_amount = random.triangular(op_cfg["min"], op_cfg["max"], op_cfg["mode"])
+        montant_transaction = round(base_amount * op_cfg["sign"], 2)
         
         # Statut (majoritairement Réalisé pour l'historique)
-        statut = random.choices(statuts, weights=[85, 15])[0]
+        # Les dates futures par rapport à aujourd'hui devraient être prévisionnelles, mais ici on simule un historique complet
+        # On garde la logique aléatoire simple pour l'instant
+        statut = random.choices(statuts, weights=[90, 10])[0]
         
         # Scénario (1 = Réalisé pour la plupart)
         id_scenario = 1 if statut == "Réalisé" else random.choice([2, 3])
@@ -328,7 +345,7 @@ def generate_fact_flux_tresorerie(comptes, temps_records, num_contreparties):
         writer.writeheader()
         for record in flux_records:
             writer.writerow(record)
-    print(f"✓ Généré fact_flux_tresorerie.csv ({len(flux_records)} lignes)")
+    print(f"[OK] Généré fact_flux_tresorerie.csv ({len(flux_records)} lignes) avec logique réaliste")
 
 
 def main():
@@ -356,8 +373,8 @@ def main():
     generate_fact_flux_tresorerie(comptes, temps_records, len(contreparties))
     
     print("=" * 60)
-    print("✓ Génération terminée avec succès!")
-    print(f"✓ Fichiers générés dans : {DATA_DIR}")
+    print("[OK] Génération terminée avec succès!")
+    print(f"[OK] Fichiers générés dans : {DATA_DIR}")
     print("=" * 60)
 
 
