@@ -55,7 +55,7 @@ style: |
 
 # 2. Problématique
 
-> "Comment l'analyse prédictive et la simulation peuvent-elles être des facteurs de gains dans la gestion de trésorerie d'une banque ?"
+> Comment l'analyse prédictive et la simulation peuvent-elles être des facteurs de gains dans la gestion de trésorerie d'une banque ?
 
 ### Constats actuels
 - **Manque de visibilité** : Données hétérogènes et dispersées.
