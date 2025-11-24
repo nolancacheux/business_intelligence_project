@@ -25,6 +25,7 @@ style: |
 ## BI Prédictive pour la Gestion de Trésorerie
 ### ZF Banque
 
+###### Nolan Cacheux, Gaspard Crépin, Amine El-Bakali, Othmane Ettahri El Joti, Sacha Evain, Rémi Hage, Lucile Lorimier
 ---
 
 # Sommaire
