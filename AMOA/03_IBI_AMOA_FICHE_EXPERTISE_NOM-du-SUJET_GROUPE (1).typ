@@ -229,7 +229,7 @@ Le projet Crésus consiste à mettre en place une plateforme centralisée de pil
 == Compréhension du contexte
 <compréhension-du-contexte>
 
-Le groupe *ZF Banque* est un acteur international de la banque de détail comprenant une dizaine de filiales présentes en Europe, en Afrique ainsi qu'en Amérique du Nord. Suivant la nomination de son nouveau Directeur Général, M. Paul en 2017, le groupe a initié une phase de transformation stratégique qui aura un impact sur ses 2800 agences et 5000 collaborateurs.
+Le groupe *ZF Banque* est un acteur européen de la banque de détail comprenant *6 filiales* présentes en Europe : France, Allemagne, Royaume-Uni, Suisse, Espagne et Italie. Suivant la nomination de son nouveau Directeur Général, M. Paul en 2017, le groupe a initié une phase de transformation stratégique visant à moderniser ses outils de pilotage financier.
 
 La direction générale a établi un plan quinquennal et identifié plusieurs chantiers prioritaires, visant notamment à moderniser les outils de gestion de trésorerie. Ce projet porté par la direction financière s'inscrit dans une stratégie à plus globale ayant pour objectif l'amélioration de la rentabilité du groupe ainsi que l'exploitation des nouvelles technologies comme leviers de performances.
 
@@ -248,7 +248,7 @@ Cette problématique s'articule autour de plusieurs défis auxquels fait face le
 
 - *Manque de visibilité :* Les positions de trésoreries peuvent être complexes et hétérogènes en raison des nombreuses sources de données.
 
-- *Incapacité à anticiper :* Dû à sa présence internationale, de nombreuses devises sont utilisées dans le cadre des opérations du groupe, rendant les prévisions de trésorerie moins fiables.
+- *Incapacité à anticiper :* Dû à sa présence multi-pays, 4 devises sont utilisées dans le cadre des opérations du groupe (EUR, USD, GBP, CHF), rendant les prévisions de trésorerie moins fiables.
 
 - *Gestion des risques :* En raison du manque de visibilité et de l'incapacité à anticiper les diverses devises, il n'est pas possible de réaliser des scénarios de stress du marché utilisant des données réelles et des prévisions réalistes, privant le groupe d'opportunités financières.
 
@@ -267,7 +267,7 @@ En nous basant sur les sections 1.2 et 1.3 du cahier des charges, nous pouvons i
 
 + *Stratégique :* Doter la Direction Financière d'un outil puissant pour en faire un véritable partenaire stratégique de la Direction Générale.
 
-  Au-delà de son rôle traditionnel, la fonction Finance doit évoluer pour devenir un véritable *partenaire stratégique* de la Direction Générale. Cela implique de fournir une vision consolidée et prospective de la situation financière du groupe. La production de scénarios alternatifs offre une capacité d'anticipation renforcée. De même, l'intégration de *KPIs financiers clés* permet d'aligner les décisions financières avec la stratégie globale. Dans cette optique, l'*aide à la décision en temps réel* devient un levier majeur. Des simulations automatiques d'impacts financiers peuvent aider à la prise de décision, qu'il s'agisse d'investissements, d'acquisitions ou de désinvestissements. En parallèle, des rapports à divers niveaux, adaptés à la Direction Générale comme aux filiales, offrent un pilotage plus fin et une meilleure réactivité.
+  Au-delà de son rôle traditionnel, la fonction Finance doit évoluer pour devenir un véritable *partenaire stratégique* de la Direction Générale. Cela implique de fournir une vision consolidée et prospective de la situation financière du groupe. La production de scénarios alternatifs offre une capacité d'anticipation renforcée. De même, l'intégration de *KPIs financiers clés* (Trésorerie Totale, Variance réel/budget, Montant moyen par opération, Répartition par type d'opération) permet d'aligner les décisions financières avec la stratégie globale. Dans cette optique, l'*aide à la décision en temps réel* devient un levier majeur. Des simulations automatiques d'impacts financiers peuvent aider à la prise de décision, qu'il s'agisse d'investissements, d'acquisitions ou de désinvestissements. En parallèle, des rapports à divers niveaux, adaptés à la Direction Générale comme aux filiales, offrent un pilotage plus fin et une meilleure réactivité.
 
 + *Opérationnel :* Fiabiliser et automatiser les processus pour permettre aux équipes de se concentrer sur des tâches à plus haute valeur ajoutée.
 
@@ -564,11 +564,11 @@ Le flux de la donnée, de sa création à sa consommation, suivra quatre étapes
       [
         *Forces*
         
-        - Présence internationale du groupe (Europe, Afrique, Amérique du Nord) qui favorise la diversité des données financières et apporte une expérience sur différents marchés
+        - Présence européenne du groupe (6 filiales : France, Allemagne, UK, Suisse, Espagne, Italie) qui favorise la diversité des données financières et apporte une expérience sur différents marchés
         
         - Volonté stratégique claire de moderniser les outils de gestion avec le soutien de la Direction Générale et la Direction Financière, garantissant les moyens mobilisés
         
-        - Optimisation multi-devise qui avec la BI prédictive permet de mieux anticiper les flux de trésorerie, réduisant les pertes liées aux fluctuations monétaires
+        - Optimisation multi-devise (EUR, USD, GBP, CHF) qui avec la BI prédictive permet de mieux anticiper les flux de trésorerie, réduisant les pertes liées aux fluctuations monétaires
         
         - Données internes riches permettant une étude plus précise et concrète renforçant l'impact de la prise de décision
       ]
@@ -646,7 +646,7 @@ Cette phase aura pour objet de préciser les contours du projet, tant attendus s
 
 - *Analyse de l'existant :* recenser les processus de gestion de trésorerie et les sources de données à exploiter (compta, systèmes bancaires, fichiers internes…).
 
-- *Définition du périmètre initial :* choisir les premières filiales puis les devises correspondantes à une première version référente de la solution (e.g. l'Europe et l'Amérique du Nord, en EUR/USD).
+- *Définition du périmètre initial :* les 6 filiales européennes (France, Allemagne, UK, Suisse, Espagne, Italie) avec les 4 devises opérationnelles (EUR, USD, GBP, CHF).
 
 - *Conception de l'architecture cible :* choisir les briques technologiques (ETL, data base, plateforme IA, outil de reporting) puis esquisser un schéma cible de flux de données « ingestion → stockage → modélisation → restitution »
 
@@ -655,18 +655,21 @@ Cette phase aura pour objet de préciser les contours du projet, tant attendus s
 
 L'enjeu sera de valider rapidement et simplement la faisabilité technique et la valeur métier du projet.
 
-- *Jeu de données :* fabrication ou extraction d'un échantillon de données multi filiales / multi devises, à enrichir éventuellement avec des données marché publiques.
+- *Jeu de données :* génération d'un échantillon de données couvrant les 6 filiales européennes, les 4 devises (EUR, USD, GBP, CHF), sur une période de 3 ans (2022-2024), avec environ 5000 transactions simulées.
 
 - *Mise en place d'un premier pipeline :* collecte (via un ETL), stockage (Data Lake ou base relationnelle…) puis consommation dans un premier modèle prédictif basique dès lors que nous disposons du jeu de données multi filiales / multi devises.
 
-- *Tableau de bord interactif :* réalisation d'un rapport Power BI mettant en lumière la trésorerie historique, les prévisions à 30 jours, et les premières simulations de scénarios de change.
+- *Tableau de bord interactif :* réalisation d'un rapport Power BI avec 3 pages d'analyse :
+  - Analyse des types d'opérations (répartition, cumuls, moyennes)
+  - Comparaison trésorerie réelle vs budget (variance par filiale et type de compte)
+  - Vue consolidée de la trésorerie par filiale, devise et période
 
 == Phase 3 — Déploiement et industrialisation
 <phase-3-déploiement-et-industrialisation>
 
 Une fois le POC validé, la solution sera étendue progressivement à l'ensemble du groupe.
 
-- *Intégration progressive des filiales et devises :* élargissement du périmètre à toutes les zones géographiques et monnaies utilisées.
+- *Intégration progressive des filiales et devises :* extension potentielle à d'autres zones géographiques (Afrique, Amérique du Nord) et devises supplémentaires.
 
 - *Renforcement des modèles prédictifs :* passage de modèles simples à des modèles plus sophistiqués (réseaux de neurones, modèles hybrides…).
 
@@ -679,9 +682,12 @@ Une fois le POC validé, la solution sera étendue progressivement à l'ensemble
 
 Dans le cadre d'un projet académique, la phase finale ne consiste pas en un déploiement en production ou un plan de transformation organisationnelle, mais en la présentation d'un livrable complet et finalisé qui illustre la faisabilité et la valeur de l'approche choisie. Elle inclut :
 
-- *Complétion du tableau de bord Power BI :* fournir un rapport interactif qui permet d'examiner l'historique et les prévisions de trésorerie, en intégrant des scénarios simulés (comme les fluctuations du taux de change EUR/USD, les retards de paiement des clients.
+- *Complétion du tableau de bord Power BI :* fournir un rapport interactif permettant :
+  - L'analyse des 9 types d'opérations (virements, dépôts, retraits, prêts, remboursements, frais bancaires, intérêts)
+  - La comparaison trésorerie réelle vs budget avec calcul de variance par filiale
+  - Le suivi de la trésorerie consolidée par filiale, devise et période (2022-2024)
 
-- *Structuration de l'architecture cible :* proposer un diagramme explicite et pédagogique des flux de données (sources → ETL → stockage → modélisation → présentation). Le but est de démontrer l'harmonie globale et la coordination efficace entre les instruments sélectionnés (par exemple : Talend / PostgreSQL / Azure ML / Power BI).
+- *Structuration de l'architecture cible :* proposer un diagramme explicite et pédagogique des flux de données (sources → ETL → stockage → modélisation → présentation). Le but est de démontrer l'harmonie globale et la coordination efficace entre les instruments sélectionnés : Python (génération de données) / PostgreSQL / Apache Airflow / Power BI.
 
 - *Présentation orale (défense) :* élaborer un support détaillant le déroulement du projet, les décisions technologiques prises, les résultats affichés sur le tableau de bord, et les horizons d'évolution possibles.
 

@@ -140,7 +140,7 @@
         line(length: 40%, stroke: 1pt + rgb("#2563eb"))
         v(1em)
         text(size: 28pt, weight: "bold", fill: rgb("#1e3a5f"))[
-          POC — Spécifications Techniques
+          POC Spécifications Techniques
         ]
         v(0.3em)
         text(size: 18pt, weight: "medium", fill: rgb("#334155"))[
@@ -312,17 +312,17 @@ Cette table centralise les flux de trésorerie et permet les agrégations par p�
 
 ==== 2. Tables de dimensions
 
-- *DIM_TEMPS* — Gère la granularité temporelle des opérations (jour, mois, année). Permet les analyses par période.
+- *DIM_TEMPS* — Gère la granularité temporelle des opérations sur la période 2022-2024 (3 ans).
 
-- *DIM_COMPTE* — Contient les informations des comptes financiers (numéro, type de compte, filiale associée).
+- *DIM_COMPTE* — Contient les 90 comptes financiers avec 4 types : Compte courant, Compte professionnel, Compte épargne, Compte de trésorerie.
 
-- *DIM_DEVISE* — Répertorie les devises utilisées, avec leur code ISO et libellé.
+- *DIM_DEVISE* — Répertorie les 4 devises utilisées : EUR, USD, GBP, CHF.
 
 - *DIM_SCENARIO* — Définit les différents scénarios d'analyse (prévisionnel, réalisé, simulé…).
 
-- *DIM_CONTREPARTIE* — Identifie les entités externes impliquées dans les opérations (fournisseurs, clients, partenaires).
+- *DIM_CONTREPARTIE* — Identifie les 44 contreparties : 20 clients, 15 fournisseurs, 6 banques partenaires, 3 institutions financières.
 
-- *DIM_FILIALE* — Contient les informations des filiales du groupe (nom, pays, région).
+- *DIM_FILIALE* — Contient les 6 filiales européennes du groupe (France, Allemagne, UK, Suisse, Espagne, Italie).
 
 ==== 3. Relations
 
@@ -371,8 +371,8 @@ Cette table est le cœur du modèle. Elle contient chaque transaction financièr
     [date_operation], [DATE], [Date effective de l'opération.],
     [montant_transaction], [NUMERIC], [Montant de la transaction dans la devise d'origine.],
     [montant_consolide_eur], [NUMERIC], [Montant converti en EUR pour la consolidation.],
-    [type_operation], [VARCHAR], [Nature de l'opération (ex: "Virement émis", "Prêt").],
-    [statut], [VARCHAR], [Statut de la transaction (ex: "Réalisé", "Prévisionnel").],
+    [type_operation], [VARCHAR], [Nature de l'opération : Virement émis, Virement reçu, Dépôt, Retrait, Prêt, Remboursement prêt, Frais bancaires, Intérêts débiteurs, Intérêts créditeurs.],
+    [statut], [VARCHAR], [Statut de la transaction : Réalisé ou Prévisionnel.],
     [id_compte], [INTEGER, FK], [Clé étrangère liant à la table DIM_COMPTE.],
     [id_devise], [INTEGER, FK], [Clé étrangère liant à DIM_DEVISE.],
     [id_scenario], [INTEGER, FK], [Clé étrangère liant à DIM_SCENARIO.],
@@ -396,7 +396,7 @@ Gère la granularité temporelle des opérations.
     [id_temps], [INTEGER, PK], [Identifiant unique de la date.],
     [jour], [INTEGER], [Jour du mois (1-31).],
     [mois], [INTEGER], [Mois de l'année (1-12).],
-    [annee], [INTEGER], [Année (ex: 2024).]
+    [annee], [INTEGER], [Année (2022, 2023 ou 2024 pour le POC).]
   ),
   caption: [Structure de la table DIM_TEMPS]
 )
@@ -411,7 +411,7 @@ Définit les différents scénarios d'analyse (réalisé, prévision, simulation
     align: (left, center, left),
     table.header([*Champ*], [*Type*], [*Description*]),
     [id_scenario], [INTEGER, PK], [Identifiant unique du scénario.],
-    [nom_scenario], [VARCHAR], [Nom du scénario (ex: "Réalisé 2024", "Simulation Taux +1%").],
+    [nom_scenario], [VARCHAR], [Nom du scénario : Réalisé, Prévisionnel, Simulation.],
     [description], [TEXT], [Description détaillée du scénario.]
   ),
   caption: [Structure de la table DIM_SCENARIO]
@@ -427,8 +427,8 @@ Répertorie les devises utilisées pour les transactions et les comptes.
     align: (left, center, left),
     table.header([*Champ*], [*Type*], [*Description*]),
     [id_devise], [INTEGER, PK], [Identifiant unique de la devise.],
-    [code_iso], [VARCHAR(3)], [Code ISO 4217 de la devise (ex: "EUR", "USD", "GBP").],
-    [libelle_devise], [VARCHAR], [Nom complet de la devise (ex: "Euro", "Dollar Américain").]
+    [code_iso], [VARCHAR(3)], [Code ISO 4217 de la devise (EUR, USD, GBP, CHF).],
+    [libelle_devise], [VARCHAR], [Nom complet (Euro, Dollar américain, Livre sterling, Franc suisse).]
   ),
   caption: [Structure de la table DIM_DEVISE]
 )
@@ -443,8 +443,8 @@ Contient les informations des comptes financiers du groupe.
     align: (left, center, left),
     table.header([*Champ*], [*Type*], [*Description*]),
     [id_compte], [INTEGER, PK], [Identifiant unique du compte.],
-    [numero_compte], [VARCHAR], [Identifiant métier du compte (ex: IBAN ou numéro interne).],
-    [type_compte], [VARCHAR], [Type de compte (ex: "Compte courant", "Compte de prêt").],
+    [numero_compte], [VARCHAR], [Identifiant métier du compte (IBAN).],
+    [type_compte], [VARCHAR], [Type de compte : Compte courant, Compte professionnel, Compte épargne, Compte de trésorerie.],
     [id_devise], [INTEGER, FK], [Clé étrangère liant à DIM_DEVISE.],
     [id_filiale], [INTEGER, FK], [Clé étrangère liant à DIM_FILIALE.]
   ),
@@ -461,8 +461,8 @@ Identifie les entités externes ou internes impliquées dans les opérations.
     align: (left, center, left),
     table.header([*Champ*], [*Type*], [*Description*]),
     [id_contrepartie], [INTEGER, PK], [Identifiant unique de la contrepartie.],
-    [nom_contrepartie], [VARCHAR], [Nom de la contrepartie (ex: "Client A", "Fournisseur B").],
-    [type_contrepartie], [VARCHAR], [Catégorie (ex: "Client", "Fournisseur", "Banque", "Interco").]
+    [nom_contrepartie], [VARCHAR], [Nom de la contrepartie (ex: "Client Entreprise 001", "BNP Paribas").],
+    [type_contrepartie], [VARCHAR], [Catégorie : Client, Fournisseur, Banque partenaire, Institution financière.]
   ),
   caption: [Structure de la table DIM_CONTREPARTIE]
 )
@@ -477,11 +477,33 @@ Décrit les entités et filiales du groupe ZF Banque.
     align: (left, center, left),
     table.header([*Champ*], [*Type*], [*Description*]),
     [id_filiale], [INTEGER, PK], [Identifiant unique de la filiale.],
-    [nom_filiale], [VARCHAR], [Nom légal ou usuel de la filiale (ex: "ZF Banque France").],
-    [pays], [VARCHAR], [Pays d'implantation de la filiale.],
-    [region], [VARCHAR], [Zone géographique (ex: "Europe", "Amérique du Nord").]
+    [nom_filiale], [VARCHAR], [Nom de la filiale (ex: "ZF Banque France", "ZF Banque Allemagne", "ZF Banque UK").],
+    [pays], [VARCHAR], [Pays d'implantation (France, Allemagne, Royaume-Uni, Suisse, Espagne, Italie).],
+    [region], [VARCHAR], [Zone géographique (Europe pour le POC).]
   ),
   caption: [Structure de la table DIM_FILIALE]
+)
+
+== KPIs et mesures calculées
+<kpis-mesures>
+
+Les indicateurs clés de performance (KPIs) suivants sont calculés dans Power BI à partir des données de la table de faits :
+
+#figure(
+  table(
+    columns: (1.5fr, 1fr, 2.5fr),
+    align: (left, center, left),
+    table.header([*KPI*], [*Type*], [*Description / Formule*]),
+    [Trésorerie Totale], [Mesure], [Somme des montants de transactions par filiale et période.],
+    [Total_Reel], [Mesure], [Somme des montants où statut = "Réalisé".],
+    [Total_Budget], [Mesure], [Somme des montants où statut = "Prévisionnel".],
+    [Variance_Montant], [Mesure], [Total_Reel - Total_Budget (écart en valeur absolue).],
+    [Variance_Percent], [Mesure], [(Total_Reel - Total_Budget) / Total_Budget × 100.],
+    [Montant moyen], [Mesure], [Moyenne des montants par type d'opération.],
+    [Cumul transactions], [Mesure], [Cumul du nombre de transactions dans le temps.],
+    [Répartition (%)], [Mesure], [Part de chaque type d'opération dans le total.]
+  ),
+  caption: [KPIs et mesures calculées dans Power BI]
 )
 
 == Mapping de données
@@ -570,21 +592,3 @@ Le mapping de données décrit les correspondances entre les données sources et
 
 = Annexe
 <annexe>
-
-#v(2em)
-
-#align(center)[
-  #block(
-    width: 80%,
-    inset: 2em,
-    fill: rgb("#f8fafc"),
-    radius: 8pt,
-    stroke: 1pt + rgb("#e2e8f0"),
-    [
-      #set text(fill: rgb("#64748b"))
-      _Document de spécifications techniques pour le Proof of Concept du projet Crésus._
-      
-      _Pour toute question, contacter l'équipe MOE._
-    ]
-  )
-]
